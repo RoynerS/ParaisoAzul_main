@@ -44,8 +44,8 @@
                            data-error="Enter Password">
                     <div class="help-block with-errors"></div>
                 </div>
-            </div>
-
+            </div>      
+            <li><a href="user_reservation.php">Reservar Habitación</a></li>
             <button class="btn btn-lg btn-success btn-block btn-signin" type="submit" name="login">LOGIN</button>
 
         </form><!-- /form -->

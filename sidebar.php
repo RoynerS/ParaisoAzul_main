@@ -79,6 +79,21 @@
             </li>
         <?php }
         ?>
+        <?php
+        if (isset($_GET['inventory'])){ ?>
+            <li class="active">
+                <a href="index.php?inventory"><em class="fa fa-cubes">&nbsp;</em>
+                    Inventario
+                </a>
+            </li>
+        <?php } else{?>
+            <li>
+                <a href="index.php?inventory"><em class="fa fa-cubes">&nbsp;</em>
+                    Inventario
+                </a>
+            </li>
+        <?php }
+    ?>
 
         <?php
         if (isset($_GET['statistics'])){ ?>
