@@ -80,6 +80,7 @@ $(document).on('click', '#roomEdit', function (e) {
 
 });
 
+
 function fetch_room(val) {
     $.ajax({
         type: 'post',

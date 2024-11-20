@@ -6,7 +6,7 @@
         </div>
         <div class="profile-usertitle">
             <div class="profile-usertitle-name"><?php echo $user['name'];?></div>
-            <div class="profile-usertitle-status"><span class="indicator label-success"></span>Manager</div>
+            
         </div>
         <div class="clear"></div>
     </div>

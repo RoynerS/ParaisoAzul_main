@@ -368,6 +368,42 @@ if (isset($_POST['add_employee'])) {
     echo json_encode($response);
 }
 
+// En ajax.php
+if (isset($_POST['item_name']) && isset($_POST['sell_quantity'])) {
+    $item_name = mysqli_real_escape_string($connection, $_POST['item_name']);
+    $sell_quantity = intval($_POST['sell_quantity']);
+
+    // Verificar si hay suficiente cantidad en inventario
+    $check_query = "SELECT quantity FROM inventory WHERE item_name = '$item_name'";
+    $check_result = mysqli_query($connection, $check_query);
+    $item = mysqli_fetch_assoc($check_result);
+
+    if ($item['quantity'] >= $sell_quantity && $sell_quantity > 0   ) {
+        // Restar la cantidad vendida
+        $update_query = "UPDATE inventory SET quantity = quantity - $sell_quantity WHERE item_name = '$item_name'";
+        $update_result = mysqli_query($connection, $update_query);
+
+        if ($update_result) {
+            // Venta registrada exitosamente
+            $_SESSION['message'] = "Venta registrada con éxito";
+            header("Location: index.php?inventory");
+            exit();
+        } else {
+            // Error al registrar la venta
+            $_SESSION['error'] = "Error al registrar la venta";
+            header("Location: index.php?inventory");
+            exit();
+        }
+    } else {
+        // Cantidad insuficiente en inventario
+        $_SESSION['error'] = "Cantidad insuficiente en inventario";
+        header("Location: index.php?inventory");
+        exit();
+    }
+}
+
+
+
 if (isset($_POST['createComplaint'])) {
     $complainant_name = $_POST['complainant_name'];
     $complaint_type = $_POST['complaint_type'];

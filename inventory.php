@@ -41,6 +41,38 @@
         </div>
     </div>
 
+    <!-- Nuevo formulario de Venta -->
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="panel panel-default">
+                <div class="panel-heading">Registrar Venta</div>
+                <div class="panel-body">
+                    <form id="sellInventoryItem" method="POST" action="ajax.php">
+                        <div class="form-group">
+                            <label>Artículo</label>
+                            <select class="form-control" name="item_name" required>
+                                <option value="">Seleccionar Artículo</option>
+                                <?php
+                                // Recuperar lista de artículos con cantidad mayor a 0
+                                $inventory_query = "SELECT DISTINCT item_name FROM inventory WHERE quantity > 0";
+                                $inventory_result = mysqli_query($connection, $inventory_query);
+                                while ($item = mysqli_fetch_assoc($inventory_result)) {
+                                    echo "<option value='" . $item['item_name'] . "'>" . $item['item_name'] . "</option>";
+                                }
+                                ?>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Cantidad a Vender</label>
+                            <input type="number" class="form-control" name="sell_quantity" min="1" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Registrar Venta</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div class="row">
         <div class="col-lg-12">
             <div class="panel panel-default">
@@ -53,7 +85,7 @@
                             <th>Tipo</th>
                             <th>Cantidad</th>
                             <th>Precio</th>
-                            <th>Acciones</th>
+                            <th>Total</th>
                         </tr>
                         </thead>
                         <tbody>
@@ -69,7 +101,7 @@
                                 <td><?php echo $item['quantity']; ?></td>
                                 <td><?php echo $item['price']; ?></td>
                                 <td>
-                                    <button class="btn btn-danger" onclick="deleteItem(<?php echo $item['id']; ?>)">Eliminar</button>
+                                <?php echo $item['price'] * $item['quantity']; ; ?>
                                 </td>
                             </tr>
                         <?php } ?>

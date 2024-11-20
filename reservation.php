@@ -1,4 +1,11 @@
 <?php
+// Variables por defecto
+$get_room_price = 0;
+$precioBase = 0;
+$tasaIVA = 0.19; // 19%
+$valorIVA = 0;
+$precioTotal = 0;
+
 if (isset($_GET['room_id'])){
     $get_room_id = $_GET['room_id'];
     $get_room_sql = "SELECT * FROM room NATURAL JOIN room_type WHERE room_id = '$get_room_id'";
@@ -9,8 +16,12 @@ if (isset($_GET['room_id'])){
     $get_room_type = $get_room['room_type'];
     $get_room_no = $get_room['room_no'];
     $get_room_price = $get_room['price'];
-}
 
+    // Cálculo de IVA
+    $precioBase = $get_room_price;
+    $valorIVA = $precioBase * $tasaIVA;
+    $precioTotal = $precioBase + $valorIVA;
+}
 ?>
 <div class="col-sm-9 col-sm-offset-3 col-lg-10 col-lg-offset-2 main">
     <div class="row">
@@ -28,7 +39,7 @@ if (isset($_GET['room_id'])){
         </div>
     </div>/.row -->
 
-    
+
 
     <div class="row">
         <div class="col-lg-12">
@@ -36,67 +47,69 @@ if (isset($_GET['room_id'])){
                 <div class="response"></div>
                 <div class="col-lg-12">
                     <?php
-                    if (isset($_GET['room_id'])){?>
+                    if (isset($_GET['room_id'])) { ?>
 
                         <div class="panel panel-default">
                             <div class="panel-heading">Room Information:
                                 <a class="btn btn-secondary pull-right" href="index.php?room_mang">Replan Booking</a>
                             </div>
                             <div class="panel-body">
-                                <div class="form-group col-lg-6">
-                                    <label>Room Type</label>
-                                    <select class="form-control" id="room_type" data-error="Select Room Type" required>
-                                        <option selected disabled>Select Room Type</option>
-                                        <option selected value="<?php echo $get_room_type_id; ?>"><?php echo $get_room_type; ?></option>
-                                    </select>
-                                    <div class="help-block with-errors"></div>
-                                </div>
 
                                 <div class="form-group col-lg-6">
                                     <label>Room No</label>
-                                    <select class="form-control" id="room_no" onchange="fetch_price(this.value)" required data-error="Select Room No">
+                                    <select class="form-control" id="room_no" onchange="fetch_price(this.value)" required
+                                        data-error="Select Room No">
                                         <option selected disabled>Select Room No</option>
-                                        <option selected value="<?php echo $get_room_id; ?>"><?php echo $get_room_no; ?></option>
+                                        <option selected value="<?php echo $get_room_id; ?>"><?php echo $get_room_no; ?>
+                                        </option>
                                     </select>
                                     <div class="help-block with-errors"></div>
                                 </div>
 
                                 <div class="form-group col-lg-6">
                                     <label>Check In Date</label>
-                                    <input type="text" class="form-control" placeholder="mm/dd/yyyy" id="check_in_date" data-error="Select Check In Date" required>
+                                    <input type="text" class="form-control" placeholder="mm/dd/yyyy" id="check_in_date"
+                                        data-error="Select Check In Date" required>
                                     <div class="help-block with-errors"></div>
                                 </div>
 
                                 <div class="form-group col-lg-6">
                                     <label>Check Out Date</label>
-                                    <input type="text" class="form-control" placeholder="mm/dd/yyyy" id="check_out_date" data-error="Select Check Out Date" required>
+                                    <input type="text" class="form-control" placeholder="mm/dd/yyyy" id="check_out_date"
+                                        data-error="Select Check Out Date" required>
                                     <div class="help-block with-errors"></div>
                                 </div>
 
                                 <div class="col-lg-12">
-                                    <h4 style="font-weight: bold">Total Days : <span id="staying_day">0</span> Days</h4>
-                                    <h4 style="font-weight: bold">Price: <span id="price"><?php echo $get_room_price; ?></span> /-</h4>
-                                    <h4 style="font-weight: bold">Total Amount : <span id="total_price">0</span> /-</h4>
+                                <h4 style="font-weight: bold">Total Days: <span id="staying_day">0</span> Days</h4>
+                                        <h4 style="font-weight: bold">Price: <span id="price"><?php echo $get_room_price; ?></span> /-</h4>
+                                        <h4 style="font-weight: bold">Precio Base: <span id="price_base">0.00</span> /-</h4>
+                                        <h4 style="font-weight: bold">IVA (19%): <span id="price_iva">0.00</span> /-</h4>
+                                        <h4 style="font-weight: bold">Precio Total con IVA: <span id="total_price_iva">0.00</span> /-</h4>
+                                    
                                 </div>
                             </div>
                         </div>
-                    <?php } else{?>
+                    <?php } else { ?>
                         <div class="panel panel-default">
                             <div class="panel-heading">Room Information:
-                                <a class="btn btn-secondary pull-right" style="border-radius:0%" href="index.php?reservation">Replan Booking</a>
+                                <a class="btn btn-secondary pull-right" style="border-radius:0%"
+                                    href="index.php?reservation">Replan Booking</a>
                             </div>
                             <div class="panel-body">
                                 <div class="form-group col-lg-6">
                                     <label>Room Type</label>
-                                    <select class="form-control" id="room_type" onchange="fetch_room(this.value);" required data-error="Select Room Type">
+                                    <select class="form-control" id="room_type" onchange="fetch_room(this.value);" required
+                                        data-error="Select Room Type">
                                         <option selected disabled>Select Room Type</option>
                                         <?php
-                                        $query  = "SELECT * FROM room_type";
-                                        $result = mysqli_query($connection,$query);
-                                        if (mysqli_num_rows($result) > 0){
-                                            while ($room_type = mysqli_fetch_assoc($result)){
-                                                echo '<option value="'.$room_type['room_type_id'].'">'.$room_type['room_type'].'</option>';
-                                            }}
+                                        $query = "SELECT * FROM room_type";
+                                        $result = mysqli_query($connection, $query);
+                                        if (mysqli_num_rows($result) > 0) {
+                                            while ($room_type = mysqli_fetch_assoc($result)) {
+                                                echo '<option value="' . $room_type['room_type_id'] . '">' . $room_type['room_type'] . '</option>';
+                                            }
+                                        }
                                         ?>
                                     </select>
                                     <div class="help-block with-errors"></div>
@@ -104,7 +117,8 @@ if (isset($_GET['room_id'])){
 
                                 <div class="form-group col-lg-6">
                                     <label>Room No</label>
-                                    <select class="form-control" id="room_no" onchange="fetch_price(this.value)" required data-error="Select Room No">
+                                    <select class="form-control" id="room_no" onchange="fetch_price(this.value)" required
+                                        data-error="Select Room No">
 
                                     </select>
                                     <div class="help-block with-errors"></div>
@@ -112,20 +126,26 @@ if (isset($_GET['room_id'])){
 
                                 <div class="form-group col-lg-6">
                                     <label>Check In Date</label>
-                                    <input type="text" class="form-control" placeholder="mm/dd/yyyy" id="check_in_date" data-error="Select Check In Date" required>
+                                    <input type="text" class="form-control" placeholder="mm/dd/yyyy" id="check_in_date"
+                                        data-error="Select Check In Date" required>
                                     <div class="help-block with-errors"></div>
                                 </div>
 
                                 <div class="form-group col-lg-6">
                                     <label>Check Out Date</label>
-                                    <input type="text" class="form-control" placeholder="mm/dd/yyyy" id="check_out_date" data-error="Select Check Out Date" required>
+                                    <input type="text" class="form-control" placeholder="mm/dd/yyyy" id="check_out_date"
+                                        data-error="Select Check Out Date" required>
                                     <div class="help-block with-errors"></div>
                                 </div>
 
                                 <div class="col-lg-12">
-                                    <h4 style="font-weight: bold">Total Days : <span id="staying_day">0</span> Days</h4>
-                                    <h4 style="font-weight: bold">Price: <span id="price">0</span> /-</h4>
-                                    <h4 style="font-weight: bold">Total Amount : <span id="total_price">0</span> /-</h4>
+                                    <div class="col-lg-12">
+                                        <h4 style="font-weight: bold">Total Days: <span id="staying_day">0</span> Days</h4>
+                                        <h4 style="font-weight: bold">Price: <span id="price"><?php echo $get_room_price; ?></span> /-</h4>
+                                        <h4 style="font-weight: bold">Precio Base: <span id="price_base">0.00</span> /-</h4>
+                                        <h4 style="font-weight: bold">IVA (19%): <span id="price_iva">0.00</span> /-</h4>
+                                        <h4 style="font-weight: bold">Precio Total con IVA: <span id="total_price_iva">0.00</span> /-</h4>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -136,7 +156,8 @@ if (isset($_GET['room_id'])){
                         <div class="panel-body">
                             <div class="form-group col-lg-6">
                                 <label>First Name</label>
-                                <input class="form-control" placeholder="First Name" id="first_name" data-error="Enter First Name" required>
+                                <input class="form-control" placeholder="First Name" id="first_name"
+                                    data-error="Enter First Name" required>
                                 <div class="help-block with-errors"></div>
                             </div>
 
@@ -147,27 +168,31 @@ if (isset($_GET['room_id'])){
 
                             <div class="form-group col-lg-6">
                                 <label>Contact Number</label>
-                                <input type="number" class="form-control" data-error="Enter Min 10 Digit" data-minlength="10" placeholder="Contact No" id="contact_no" required>
+                                <input type="number" class="form-control" data-error="Enter Min 10 Digit"
+                                    data-minlength="10" placeholder="Contact No" id="contact_no" required>
                                 <div class="help-block with-errors"></div>
                             </div>
 
                             <div class="form-group col-lg-6">
                                 <label>Email Address</label>
-                                <input type="email" class="form-control" placeholder="Email Address" id="email" data-error="Enter Valid Email Address" required>
+                                <input type="email" class="form-control" placeholder="Email Address" id="email"
+                                    data-error="Enter Valid Email Address" required>
                                 <div class="help-block with-errors"></div>
                             </div>
 
                             <div class="form-group col-lg-6">
                                 <label>ID Card Type</label>
-                                <select class="form-control" id="id_card_id" data-error="Select ID Card Type" required onchange="validId(this.value);">
+                                <select class="form-control" id="id_card_id" data-error="Select ID Card Type" required
+                                    onchange="validId(this.value);">
                                     <option selected disabled>Select ID Card Type</option>
                                     <?php
-                                    $query  = "SELECT * FROM id_card_type";
-                                    $result = mysqli_query($connection,$query);
-                                    if (mysqli_num_rows($result) > 0){
-                                        while ($id_card_type = mysqli_fetch_assoc($result)){
-                                            echo '<option value="'.$id_card_type['id_card_type_id'].'">'.$id_card_type['id_card_type'].'</option>';
-                                        }}
+                                    $query = "SELECT * FROM id_card_type";
+                                    $result = mysqli_query($connection, $query);
+                                    if (mysqli_num_rows($result) > 0) {
+                                        while ($id_card_type = mysqli_fetch_assoc($result)) {
+                                            echo '<option value="' . $id_card_type['id_card_type_id'] . '">' . $id_card_type['id_card_type'] . '</option>';
+                                        }
+                                    }
                                     ?>
                                 </select>
                                 <div class="help-block with-errors"></div>
@@ -175,18 +200,21 @@ if (isset($_GET['room_id'])){
 
                             <div class="form-group col-lg-6">
                                 <label>Selected ID Card Number</label>
-                                <input type="text" class="form-control" placeholder="ID Card Number" id="id_card_no" data-error="Enter Valid ID Card No" required>
+                                <input type="text" class="form-control" placeholder="ID Card Number" id="id_card_no"
+                                    data-error="Enter Valid ID Card No" required>
                                 <div class="help-block with-errors"></div>
                             </div>
 
                             <div class="form-group col-lg-12">
                                 <label>Residential Address</label>
-                                <input type="text" class="form-control" placeholder="Full Address" id="address" required>
+                                <input type="text" class="form-control" placeholder="Full Address" id="address"
+                                    required>
                                 <div class="help-block with-errors"></div>
                             </div>
                         </div>
                     </div>
-                    <button type="submit" class="btn btn-lg btn-success pull-right" style="border-radius:0%">Submit</button>
+                    <button type="submit" class="btn btn-lg btn-success pull-right"
+                        style="border-radius:0%">Submit</button>
                 </div>
             </form>
         </div>
@@ -194,11 +222,11 @@ if (isset($_GET['room_id'])){
 
     <div class="row">
         <div class="col-sm-12">
-            <p class="back-link">Developed By Prem Chand Saini</p>
+
         </div>
     </div>
 
-</div>    <!--/.main-->
+</div> <!--/.main-->
 
 
 <!-- Booking Confirmation-->
@@ -214,7 +242,8 @@ if (isset($_GET['room_id'])){
             <div class="modal-body">
                 <div class="row">
                     <div class="col-lg-12">
-                        <div class="alert bg-success alert-dismissable" role="alert"><em class="fa fa-lg fa-check-circle">&nbsp;</em>Room Successfully Booked</div>
+                        <div class="alert bg-success alert-dismissable" role="alert"><em
+                                class="fa fa-lg fa-check-circle">&nbsp;</em>Room Successfully Booked</div>
                         <table class="table table-striped table-bordered table-responsive">
                             <!-- <thead>
                             <tr>
@@ -223,34 +252,34 @@ if (isset($_GET['room_id'])){
                             </tr>
                             </thead> -->
                             <tbody>
-                            <tr>
-                                <td><b>Customer Name</b></td>
-                                <td id="getCustomerName"></td>
-                            </tr>
-                            <tr>
-                                <td><b>Room Type</b></td>
-                                <td id="getRoomType"></td>
-                            </tr>
-                            <tr>
-                                <td><b>Room No</b></td>
-                                <td id="getRoomNo"></td>
-                            </tr>
-                            <tr>
-                                <td><b>Check In</b></td>
-                                <td id="getCheckIn"></td>
-                            </tr>
-                            <tr>
-                                <td><b>Check Out</b></td>
-                                <td id="getCheckOut"></td>
-                            </tr>
-                            <tr>
-                                <td><b>Total Amount</b></td>
-                                <td id="getTotalPrice"></td>
-                            </tr>
-                            <tr>
-                                <td><b>Payment Status</b></td>
-                                <td id="getPaymentStaus"></td>
-                            </tr>
+                                <tr>
+                                    <td><b>Customer Name</b></td>
+                                    <td id="getCustomerName"></td>
+                                </tr>
+                                <tr>
+                                    <td><b>Room Type</b></td>
+                                    <td id="getRoomType"></td>
+                                </tr>
+                                <tr>
+                                    <td><b>Room No</b></td>
+                                    <td id="getRoomNo"></td>
+                                </tr>
+                                <tr>
+                                    <td><b>Check In</b></td>
+                                    <td id="getCheckIn"></td>
+                                </tr>
+                                <tr>
+                                    <td><b>Check Out</b></td>
+                                    <td id="getCheckOut"></td>
+                                </tr>
+                                <tr>
+                                    <td><b>Total Amount</b></td>
+                                    <td id="getTotalPrice"></td>
+                                </tr>
+                                <tr>
+                                    <td><b>Payment Status</b></td>
+                                    <td id="getPaymentStaus"></td>
+                                </tr>
 
                             </tbody>
                         </table>
@@ -258,11 +287,10 @@ if (isset($_GET['room_id'])){
                 </div>
             </div>
             <div class="modal-footer">
-                <a class="btn btn-primary" style="border-radius:60px;" href="index.php?reservation"><i class="fa fa-check-circle"></i></a>
+                <a class="btn btn-primary" style="border-radius:60px;" href="index.php?reservation"><i
+                        class="fa fa-check-circle"></i></a>
             </div>
         </div>
 
     </div>
 </div>
-
-
